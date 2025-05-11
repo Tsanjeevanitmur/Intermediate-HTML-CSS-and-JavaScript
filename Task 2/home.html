@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Form & To-Do List</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header, footer, nav {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 1em;
+    }
+
+    nav {
+      background-color: #444;
+    }
+
+    main {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: 0.5s ease;
+    }
+
+    main.grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+
+    section {
+      width: 100%;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    form, .todo-list {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1em;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input[type="text"], input[type="email"], textarea {
+      padding: 0.5em;
+      font-size: 1em;
+    }
+
+    input[type="submit"], .todo-list button {
+      padding: 0.7em;
+      font-size: 1em;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #218838;
+    }
+
+    .todo-list {
+      display: none;
+    }
+
+    .todo-item {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5em;
+    }
+
+    .todo-item button {
+      background-color: red;
+    }
+
+    @media (max-width: 768px) {
+      main.grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Responsive Contact Form & To-Do List</h1>
+  </header>
+
+  <nav>Home</nav>
+
+  <main id="mainContent">
+    <section>
+      <form id="contactForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required />
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" required />
+
+        <label for="message">Message:</label>
+        <textarea id="message" rows="4" required></textarea>
+
+        <input type="submit" value="Submit" />
+      </form>
+    </section>
+
+    <section class="todo-list" id="todoSection">
+      <h2>To-Do List</h2>
+      <input type="text" id="todoInput" placeholder="New task" />
+      <input type="file" id="todoImage" accept="image/*" />
+      <div style="margin-top: 1em;">
+        <button onclick="addTodo()">Add Task</button>
+      </div>
+      <ul id="todoItems"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 INDIA</p>
+  </footer>
+
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email)) {
+        alert("Wrong email format.");
+        return;
+      }
+
+      ['name', 'email', 'message'].forEach(id => document.getElementById(id).disabled = true);
+      this.querySelector('input[type="submit"]').style.display = 'none';
+      document.getElementById('mainContent').classList.add('grid-layout');
+      document.getElementById('todoSection').style.display = 'block';
+    });
+
+    function addTodo() {
+      const task = document.getElementById('todoInput').value.trim();
+      const file = document.getElementById('todoImage').files[0];
+      if (!task) return;
+
+      const li = document.createElement('li');
+      li.className = 'todo-item';
+
+      if (file?.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          li.innerHTML = `
+            <div style="flex:1">
+              <strong>${task}</strong><br/>
+              <img src="${e.target.result}" alt="Task Image" style="max-width: 100px; margin-top: 5px;" />
+            </div>
+            <button onclick="removeTodo(this)">Remove</button>
+          `;
+          document.getElementById('todoItems').appendChild(li);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        li.innerHTML = `
+          <div style="flex:1"><strong>${task}</strong></div>
+          <button onclick="removeTodo(this)">Remove</button>
+        `;
+        document.getElementById('todoItems').appendChild(li);
+      }
+
+      document.getElementById('todoInput').value = '';
+      document.getElementById('todoImage').value = '';
+    }
+
+    function removeTodo(button) {
+      button.parentElement.remove();
+    }
+  </script>
+</body>
+</html>
